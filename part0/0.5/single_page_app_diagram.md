@@ -20,16 +20,19 @@ sequenceDiagram
     server-->>browser: JS file
     deactivate server
 
+    activate browser
     Note right of browser: The browser starts executing the JavaScript code that fetches the JSON from the server
-
     Note right of browser: The browser executes JavaScript to define callbacks for the xhttp request and form submit
+    deactivate browser
 
     browser->>server: GET https://studies.cs.helsinki.fi/exampleapp/data.json
     activate server
     server-->>browser: JSON Array
-    deactivate server    
+    deactivate server
 
+    activate browser
     Note right of browser: The browser executes the callback function that renders the notes
 
     browser-->>user: Presents notes SPA
+    deactivate browser
 ```
