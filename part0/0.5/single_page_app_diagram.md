@@ -4,32 +4,26 @@ sequenceDiagram
     participant browser
     participant server
 
-    Note right of user: Interaction begins on the page https://studies.cs.helsinki.fi/exampleapp/notes 
-
-    user->>browser: Writes something into the new note text field
-    user->>browser: Clicks the Save button
-    browser->>server: POST https://studies.cs.helsinki.fi/exampleapp/new_note
-    activate server
-    server-->>browser: 302 response
-    deactivate server
-
-    browser->>server: GET https://studies.cs.helsinki.fi/exampleapp/notes
+    user->>browser: Enters https://studies.cs.helsinki.fi/exampleapp/spa into the navigation bar
+    browser->>server: GET https://studies.cs.helsinki.fi/exampleapp/spa
     activate server
     server-->>browser: HTML document
     deactivate server
 
     browser->>server: GET https://studies.cs.helsinki.fi/exampleapp/main.css
     activate server
-    server-->>browser: the css file
+    server-->>browser: CSS file
     deactivate server
-    
-    browser->>server: GET https://studies.cs.helsinki.fi/exampleapp/main.js
+
+    browser->>server: GET https://studies.cs.helsinki.fi/exampleapp/spa.js
     activate server
-    server-->>browser: the JavaScript file
+    server-->>browser: JS file
     deactivate server
-    
+
     Note right of browser: The browser starts executing the JavaScript code that fetches the JSON from the server
-    
+
+    Note right of browser: The browser executes JavaScript to define callbacks for the xhttp request and form submit
+
     browser->>server: GET https://studies.cs.helsinki.fi/exampleapp/data.json
     activate server
     server-->>browser: JSON Array
@@ -37,5 +31,5 @@ sequenceDiagram
 
     Note right of browser: The browser executes the callback function that renders the notes
 
-    browser-->>user: Presents reloaded notes page
+    browser-->>user: Presents notes SPA
 ```
