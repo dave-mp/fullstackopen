@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
+import personsService from "./services/persons";
 import Filter from "./components/Filter";
 import PersonForm from "./components/PersonForm";
 import Persons from "./components/Persons";
@@ -11,8 +11,8 @@ const App = () => {
   const [filterText, setFilterText] = useState("");
 
   useEffect(() => {
-    axios.get("http://localhost:3001/persons").then((response) => {
-      setPersons(response.data);
+    personsService.getAll().then(({ data }) => {
+      setPersons(data);
     });
   }, []);
 
@@ -23,12 +23,42 @@ const App = () => {
 
   const addPerson = (event) => {
     event.preventDefault();
-    if (persons.some((p) => p.name.toLowerCase() === newName.trim())) {
-      alert(`${newName} is already added to phonebook`);
+    const existingPerson = persons.find(
+      (p) => p.name.toLowerCase() === newName.trim().toLowerCase()
+    );
+    if (existingPerson) {
+      if (
+        window.confirm(
+          `${newName} is already added to phonebook, replace the old number with a new one?`
+        )
+      ) {
+        personsService
+          .update(existingPerson.id, {
+            name: newName.trim(),
+            number: newNumber,
+          })
+          .then(({ data }) => {
+            setPersons(persons.map((p) => (data.id === p.id ? data : p)));
+            setNewName("");
+            setNewNumber("");
+          });
+      }
     } else {
-      setPersons(persons.concat({ name: newName.trim(), number: newNumber }));
-      setNewName("");
-      setNewNumber("");
+      personsService
+        .create({ name: newName.trim(), number: newNumber })
+        .then(({ data }) => {
+          setPersons(persons.concat(data));
+          setNewName("");
+          setNewNumber("");
+        });
+    }
+  };
+
+  const deletePerson = (person) => {
+    if (window.confirm(`Delete ${person.name}?`)) {
+      personsService.remove(person.id).then(() => {
+        setPersons(persons.filter((p) => p.id !== person.id));
+      });
     }
   };
 
@@ -53,7 +83,11 @@ const App = () => {
 
       <h2>Numbers</h2>
 
-      <Persons persons={persons} filterText={filterText} />
+      <Persons
+        persons={persons}
+        filterText={filterText}
+        deletePerson={deletePerson}
+      />
     </div>
   );
 };
